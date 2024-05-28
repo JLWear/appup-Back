@@ -14,7 +14,7 @@ class StripeController extends Controller
     var $stripe_sk = 'pk_test_51PKyLKGSWega41ZG9q0DFXHLC6AKNQW6T4V5HIq4YpDz7BzWNlz7QjADbShSnB8fcw1BsWNNScTimXLviehqG9B3000zdH2H5h';
 
     public function checkout(){
-        \Stripe\Stripe::setApiKey($stripe_sk);
+        \Stripe\Stripe::setApiKey('sk_test_51PKyLKGSWega41ZG4CHZCvs61QPXtvD1DiMTh4v2W7amXeikK69B7496rR8qQOQWoHlkW2LRixt3qeiI4UQQFWCi00e8iyAg6v');
         header('Content-Type: application/json');
 
         $session = \Stripe\Checkout\Session::create([
@@ -39,9 +39,10 @@ class StripeController extends Controller
                 'capture_method' => 'manual',
                 'setup_future_usage' => 'off_session'
             ],
-            'success_url' => $domain + '?transaction_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => $domain + 'payment_failed'
+            'success_url' => 'http://localhost:4200/success?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => 'http://localhost:4200/cancel'
         ]);
+        return response()->json(['sessionId' => $session->id]);
     }
 
     public function success(){
