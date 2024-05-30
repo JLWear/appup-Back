@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CheckoutSession;
 
 class StripeController extends Controller
 {
@@ -10,12 +11,19 @@ class StripeController extends Controller
 
     }
 
-    var $domain = 'localhost:4200/success';
-    var $stripe_sk = 'pk_test_51PKyLKGSWega41ZG9q0DFXHLC6AKNQW6T4V5HIq4YpDz7BzWNlz7QjADbShSnB8fcw1BsWNNScTimXLviehqG9B3000zdH2H5h';
-
-    public function checkout(){
+    public function checkout(Request $request)
+    {
         \Stripe\Stripe::setApiKey('sk_test_51PKyLKGSWega41ZG4CHZCvs61QPXtvD1DiMTh4v2W7amXeikK69B7496rR8qQOQWoHlkW2LRixt3qeiI4UQQFWCi00e8iyAg6v');
         header('Content-Type: application/json');
+
+        $checkoutSession = CheckoutSession::create([
+            'name' => $request->name,
+            'firstname' => $request->firstname,
+            'age' => $request->age,
+            'locationCity' => $request->locationCity,
+            'carToRent' => $request->carToRent,
+            'token' => $request->token,
+        ]);
 
         $session = \Stripe\Checkout\Session::create([
             'submit_type' => 'pay',
@@ -32,7 +40,7 @@ class StripeController extends Controller
                 'quantity' => 1,
             ]],
             'metadata' => [
-                //'token' => $token
+                'token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIiwiZmlyc3RuYW1lIjoiIiwiYWdlIjoiIiwibG9jYXRpb25DaXR5IjoiIiwiY2FyVG9SZW50IjoiIiwidG9rZW4iOiIifQ.7AbSVI89ubn-KTF6tsBEwvrtDLTH-V4d4sY0DAtAFww'
             ],
             'mode' => 'payment',
             'payment_intent_data' => [
@@ -42,10 +50,15 @@ class StripeController extends Controller
             'success_url' => 'http://localhost:4200/success?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => 'http://localhost:4200/cancel'
         ]);
+        $checkoutSession->update(['sessionId' => $session->id]);
         return response()->json(['sessionId' => $session->id]);
     }
 
-    public function success(){
+    public function success(Request $request)
+    {
+        // Récupérer les détails de la session de paiement depuis la base de données
+        $checkoutSession = CheckoutSession::where('sessionId', $request->sessionId)->first();
 
+        return response()->json($checkoutSession);
     }
 }
