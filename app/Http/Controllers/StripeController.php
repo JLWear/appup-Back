@@ -56,9 +56,40 @@ class StripeController extends Controller
 
     public function success(Request $request)
     {
+        $stripe = new \Stripe\StripeClient('sk_test_51PKyLKGSWega41ZG4CHZCvs61QPXtvD1DiMTh4v2W7amXeikK69B7496rR8qQOQWoHlkW2LRixt3qeiI4UQQFWCi00e8iyAg6v');
+
+        $response = $stripe->checkout->sessions->retrieve(
+            $request->sessionId, []
+        );
+
+        $paymentI = $stripe->paymentIntents->retrieve(
+            $response->payment_intent,
+            []);
+
+
+        $paymentM = $stripe->paymentMethods->retrieve(
+            $paymentI->payment_method,
+            []);
+
+
         // Récupérer les détails de la session de paiement depuis la base de données
         $checkoutSession = CheckoutSession::where('sessionId', $request->sessionId)->first();
 
-        return response()->json($checkoutSession);
+        $amount = $response->amount_total / 100;
+
+        $checkoutSession2 = CheckoutSession::create([
+            'name' => $checkoutSession->name,
+            'firstname' => $checkoutSession->firstname,
+            'age' => $checkoutSession->age,
+            'locationCity' => $checkoutSession->locationCity,
+            'carToRent' => $checkoutSession->carToRent,
+            'token' => $checkoutSession->token,
+            'email' => $paymentM->billing_details->email,
+            'last4' => $paymentM->card->last4,
+            'amount_total' => $amount
+        ]);
+
+
+        return response()->json($checkoutSession2);
     }
 }

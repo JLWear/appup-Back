@@ -21,6 +21,9 @@ class CheckoutSession extends Model
         'carToRent',
         'locationCity',
         'token',
-        'sessionId'
+        'sessionId',
+        'email',
+        'last4',
+        'amount_total'
     ];
 }

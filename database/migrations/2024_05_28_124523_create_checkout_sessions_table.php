@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('checkout_sessions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('firstname');
-            $table->integer('age');
-            $table->string('locationCity');
-            $table->string('carToRent');
-            $table->string('token');
+            $table->string('name')->nullable();
+            $table->string('firstname')->nullable();
+            $table->integer('age')->nullable();
+            $table->string('locationCity')->nullable();
+            $table->string('carToRent')->nullable();
+            $table->string('token')->nullable();
             $table->string('sessionId')->nullable();
+            $table->string('email')->nullable();
+            $table->string('last4')->nullable();
+            $table->string('amount_total')->nullable();
             $table->timestamps();
         });
     }

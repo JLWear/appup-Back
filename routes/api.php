@@ -20,4 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/checkout', [StripeController::class, 'checkout'])->name('stripe.checkout');
-Route::post('/caca', [StripeController::class, 'success'])->name('stripe.success');
+Route::post('/details', [StripeController::class, 'success'])->name('stripe.success');
